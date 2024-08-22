@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voting System</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Voting System</h1>
+        <div class="registration">
+            <h2>Register Voter</h2>
+            <form id="registrationForm">
+                <input type="text" id="name" placeholder="Name" required>
+                <input type="number" id="age" placeholder="Age" required>
+                <button type="submit">Register</button>
+            </form>
+            <p id="registrationResult"></p>
+        </div>
+
+        <div class="voting">
+            <h2>Cast Vote</h2>
+            <form id="votingForm">
+                <input type="text" id="voterId" placeholder="Voter ID" required>
+                <select id="candidate">
+                    <option value="Alice">Alice</option>
+                    <option value="Bob">Bob</option>
+                    <option value="Charlie">Charlie</option>
+                </select>
+                <button type="submit">Vote</button>
+            </form>
+            <p id="votingResult"></p>
+        </div>
+
+        <div class="results">
+            <h2>Voting Results</h2>
+            <button id="tallyVotes">Tally Votes</button>
+            <div id="results"></div>
+        </div>
+    </div>
+
+    <script src="/static/scripts.js"></script>
+</body>
+</html>
