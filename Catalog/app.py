@@ -1,13 +1,14 @@
 from flask import Flask, render_template, request, jsonify
 from hashlib import sha256
-import random
+import os
+import secrets
 import string
 
 app = Flask(__name__)
 
 # Helper functions
 def create_salt():
-    return ''.join(random.choices(string.ascii_letters + string.digits, k=16))
+    return secrets.token_hex(8)
 
 def hash_data(data, salt):
     return sha256((data + salt).encode()).hexdigest()
@@ -27,7 +28,11 @@ class VoterRegistry:
         return voter_id
     
     def generate_voter_id(self):
-        return ''.join(random.choices(string.ascii_letters + string.digits, k=8))
+        alphabet = string.ascii_letters + string.digits
+        while True:
+            voter_id = ''.join(secrets.choice(alphabet) for _ in range(8))
+            if voter_id not in self.voters:
+                return voter_id
     
     def validate_voter(self, voter_id):
         return voter_id in self.voters and not self.voters[voter_id]['voted']
@@ -53,7 +58,7 @@ class VotingSystem:
         
         salt = create_salt()
         hashed_vote = hash_data(candidate, salt)
-        self.votes.append(hashed_vote)
+        self.votes.append((hashed_vote, salt))
         
         voter_registry.mark_voted(voter_id)
         return True
@@ -61,11 +66,11 @@ class VotingSystem:
     def tally_votes(self):
         tally = {candidate: 0 for candidate in self.candidates}
         
-        for vote in self.votes:
+        for hashed_vote, salt in self.votes:
             for candidate in self.candidates:
-                for salt_candidate in [vote[-16:]]:
-                    if vote == hash_data(candidate, salt_candidate):
-                        tally[candidate] += 1
+                if hashed_vote == hash_data(candidate, salt):
+                    tally[candidate] += 1
+                    break
         
         return tally
 
@@ -100,4 +105,4 @@ def tally():
     return jsonify(results)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=os.environ.get("FLASK_DEBUG") == "1")
